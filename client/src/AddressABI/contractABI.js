@@ -1,285 +1,197 @@
 export const contractABI = [
   {
-    anonymous: false,
-    inputs: [
+    "inputs": [
       {
-        indexed: true,
-        internalType: "address",
-        name: "user",
-        type: "address",
+        "internalType": "string",
+        "name": "_fileName",
+        "type": "string"
       },
       {
-        indexed: false,
-        internalType: "string",
-        name: "ipfsHash",
-        type: "string",
-      },
+        "internalType": "string",
+        "name": "_ipfsHash",
+        "type": "string"
+      }
     ],
-    name: "FileAdded",
-    type: "event",
+    "name": "addFile",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    anonymous: false,
-    inputs: [
+    "inputs": [
       {
-        indexed: true,
-        internalType: "address",
-        name: "user",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "friend",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "ipfsHash",
-        type: "string",
-      },
+        "internalType": "address",
+        "name": "_friend",
+        "type": "address"
+      }
     ],
-    name: "FileApproved",
-    type: "event",
+    "name": "addFriend",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    anonymous: false,
-    inputs: [
+    "inputs": [
       {
-        indexed: true,
-        internalType: "address",
-        name: "user",
-        type: "address",
+        "internalType": "string",
+        "name": "_ipfsHash",
+        "type": "string"
       },
       {
-        indexed: false,
-        internalType: "string",
-        name: "ipfsHash",
-        type: "string",
-      },
+        "internalType": "address[]",
+        "name": "_friends",
+        "type": "address[]"
+      }
     ],
-    name: "FileDeleted",
-    type: "event",
+    "name": "approveFile",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    anonymous: false,
-    inputs: [
+    "inputs": [
       {
-        indexed: true,
-        internalType: "address",
-        name: "user",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "friend",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "ipfsHash",
-        type: "string",
-      },
+        "internalType": "string",
+        "name": "_ipfsHash",
+        "type": "string"
+      }
     ],
-    name: "FileDisapproved",
-    type: "event",
+    "name": "deleteFile",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    anonymous: false,
-    inputs: [
+    "inputs": [
       {
-        indexed: true,
-        internalType: "address",
-        name: "user",
-        type: "address",
+        "internalType": "string",
+        "name": "_ipfsHash",
+        "type": "string"
       },
       {
-        indexed: false,
-        internalType: "address",
-        name: "friend",
-        type: "address",
-      },
+        "internalType": "address[]",
+        "name": "_friends",
+        "type": "address[]"
+      }
     ],
-    name: "FriendAdded",
-    type: "event",
+    "name": "disapproveFile",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    anonymous: false,
-    inputs: [
+    "inputs": [],
+    "name": "getAllFiles",
+    "outputs": [
       {
-        indexed: true,
-        internalType: "address",
-        name: "user",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "friend",
-        type: "address",
-      },
-    ],
-    name: "FriendRemoved",
-    type: "event",
-  },
-  {
-    inputs: [
-      {
-        internalType: "string",
-        name: "_ipfsHash",
-        type: "string",
-      },
-    ],
-    name: "addFile",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_friend",
-        type: "address",
-      },
-    ],
-    name: "addFriend",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "string",
-        name: "_ipfsHash",
-        type: "string",
-      },
-      {
-        internalType: "address",
-        name: "_friend",
-        type: "address",
-      },
-    ],
-    name: "approveFile",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "string",
-        name: "_ipfsHash",
-        type: "string",
-      },
-    ],
-    name: "deleteFile",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "string",
-        name: "_ipfsHash",
-        type: "string",
-      },
-      {
-        internalType: "address",
-        name: "_friend",
-        type: "address",
-      },
-    ],
-    name: "disapproveFile",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getAllFiles",
-    outputs: [
-      {
-        components: [
+        "components": [
           {
-            internalType: "string",
-            name: "ipfsHash",
-            type: "string",
+            "internalType": "string",
+            "name": "fileName",
+            "type": "string"
           },
           {
-            internalType: "uint256",
-            name: "timestamp",
-            type: "uint256",
+            "internalType": "string",
+            "name": "ipfsHash",
+            "type": "string"
           },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
         ],
-        internalType: "struct Drive.File[]",
-        name: "",
-        type: "tuple[]",
-      },
+        "internalType": "struct Drive.File[]",
+        "name": "",
+        "type": "tuple[]"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [],
+    "name": "getApprovedFiles",
+    "outputs": [
       {
-        internalType: "address",
-        name: "_from",
-        type: "address",
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
       },
-    ],
-    name: "getApprovedFiles",
-    outputs: [
       {
-        components: [
+        "components": [
           {
-            internalType: "string",
-            name: "ipfsHash",
-            type: "string",
+            "internalType": "string",
+            "name": "fileName",
+            "type": "string"
           },
           {
-            internalType: "uint256",
-            name: "timestamp",
-            type: "uint256",
+            "internalType": "string",
+            "name": "ipfsHash",
+            "type": "string"
           },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
         ],
-        internalType: "struct Drive.File[]",
-        name: "",
-        type: "tuple[]",
-      },
+        "internalType": "struct Drive.File[][]",
+        "name": "",
+        "type": "tuple[][]"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: "getFriends",
-    outputs: [
+    "inputs": [],
+    "name": "getFriends",
+    "outputs": [
       {
-        internalType: "address[]",
-        name: "",
-        type: "address[]",
-      },
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "address",
-        name: "_friend",
-        type: "address",
-      },
+        "internalType": "string",
+        "name": "_ipfsHash",
+        "type": "string"
+      }
     ],
-    name: "removeFriend",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "getFriendsApprovalStatus",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      },
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
-];
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_friend",
+        "type": "address"
+      }
+    ],
+    "name": "removeFriend",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

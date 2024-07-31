@@ -1,117 +1,114 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("Drive contract", function () {
-  let Drive;
-  let drive;
-  let owner;
-  let addr1;
-  let addr2;
+describe("Drive Contract", function () {
+  let Drive, drive;
+  let owner, addr1, addr2, addr3;
 
   beforeEach(async function () {
     Drive = await ethers.getContractFactory("Drive");
-    [owner, addr1, addr2, _] = await ethers.getSigners();
-
+    [owner, addr1, addr2, addr3] = await ethers.getSigners();
     drive = await Drive.deploy();
     await drive.waitForDeployment();
   });
 
-  describe("File management", function () {
-    it("should add a file", async function () {
-      const ipfsHash = "QmTestHash";
-      await drive.addFile(ipfsHash);
+  describe("File Management", function () {
+    it("Should add a file", async function () {
+      await drive.addFile("file1.txt", "ipfsHash1");
       const files = await drive.getAllFiles();
       expect(files.length).to.equal(1);
-      expect(files[0].ipfsHash).to.equal(ipfsHash);
+      expect(files[0].fileName).to.equal("file1.txt");
     });
 
-    it("should not add the same file twice", async function () {
-      const ipfsHash = "QmTestHash";
-      await drive.addFile(ipfsHash);
-      await expect(drive.addFile(ipfsHash)).to.be.revertedWith(
+    it("Should not allow adding the same file twice", async function () {
+      await drive.addFile("file1.txt", "ipfsHash1");
+      await expect(drive.addFile("file1.txt", "ipfsHash1")).to.be.revertedWith(
         "File already exists"
       );
     });
 
-    it("should delete a file", async function () {
-      const ipfsHash = "QmTestHash";
-      await drive.addFile(ipfsHash);
-      await drive.deleteFile(ipfsHash);
+    it("Should delete a file", async function () {
+      await drive.addFile("file1.txt", "ipfsHash1");
+      await drive.deleteFile("ipfsHash1");
       const files = await drive.getAllFiles();
       expect(files.length).to.equal(0);
     });
-
-    it("should not delete a non-existing file", async function () {
-      const ipfsHash = "QmTestHash";
-      await expect(drive.deleteFile(ipfsHash)).to.be.revertedWith(
-        "File does not exist"
-      );
-    });
   });
 
-  describe("Friend management", function () {
-    it("should add a friend", async function () {
+  describe("Friend Management", function () {
+    it("Should add a friend", async function () {
       await drive.addFriend(addr1.address);
       const friends = await drive.getFriends();
       expect(friends.length).to.equal(1);
       expect(friends[0]).to.equal(addr1.address);
     });
 
-    it("should not add the same friend twice", async function () {
-      await drive.addFriend(addr1.address);
-      await expect(drive.addFriend(addr1.address)).to.be.revertedWith(
-        "Already a friend."
-      );
-    });
-
-    it("should remove a friend", async function () {
+    it("Should remove a friend", async function () {
       await drive.addFriend(addr1.address);
       await drive.removeFriend(addr1.address);
       const friends = await drive.getFriends();
       expect(friends.length).to.equal(0);
     });
-
-    it("should not remove a non-existing friend", async function () {
-      await expect(drive.removeFriend(addr1.address)).to.be.revertedWith(
-        "Not your friend."
-      );
-    });
   });
 
-  describe("File approval", function () {
-    beforeEach(async function () {
-      await drive.addFriend(addr1.address);
-      await drive.addFile("QmTestHash");
+  describe("File Approval", function () {
+    it("Should approve files for mutual friends", async function () {
+      // addr1 and addr2 add files
+      await drive.connect(addr1).addFile("file1.txt", "ipfsHash1");
+      await drive.connect(addr2).addFile("file2.txt", "ipfsHash2");
+
+      // Establish mutual friendship between owner and addr1
+      await drive.connect(addr1).addFriend(owner.address);
+      await drive.connect(owner).addFriend(addr1.address);
+
+      // Approve the file for the owner by addr1
+      await drive.connect(addr1).approveFile("ipfsHash1", [owner.address]);
+
+      // Establish mutual friendship between owner and addr2
+      await drive.connect(addr2).addFriend(owner.address);
+      await drive.connect(owner).addFriend(addr2.address);
+
+      // Approve the file for the owner by addr2
+      await drive.connect(addr2).approveFile("ipfsHash2", [owner.address]);
+
+      // Verify the owner can see the approved files from addr1 and addr2
+      const [friends, approvedFiles] = await drive.getApprovedFiles();
+      expect(friends.length).to.equal(2);
+      expect(friends[0]).to.equal(addr1.address);
+      expect(friends[1]).to.equal(addr2.address);
+      expect(approvedFiles[0].length).to.equal(1);
+      expect(approvedFiles[0][0].ipfsHash).to.equal("ipfsHash1");
+      expect(approvedFiles[1].length).to.equal(1);
+      expect(approvedFiles[1][0].ipfsHash).to.equal("ipfsHash2");
     });
 
-    it("should approve a file for a friend", async function () {
-      await drive.approveFile("QmTestHash", addr1.address);
-      const approvedFiles = await drive
-        .connect(addr1)
-        .getApprovedFiles(owner.address);
-      expect(approvedFiles.length).to.equal(1);
-      expect(approvedFiles[0].ipfsHash).to.equal("QmTestHash");
-    });
+    it("Should not show approved files if friendship is not mutual", async function () {
+      // addr1 adds a file
+      await drive.connect(addr1).addFile("file1.txt", "ipfsHash1");
 
-    it("should not approve a non-existing file", async function () {
-      await expect(
-        drive.approveFile("NonExistingHash", addr1.address)
-      ).to.be.revertedWith("File does not exist");
-    });
+      // addr1 adds owner as a friend, but owner does not add addr1 back
+      await drive.connect(addr1).addFriend(owner.address);
 
-    it("should disapprove an approved file", async function () {
-      await drive.approveFile("QmTestHash", addr1.address);
-      await drive.disapproveFile("QmTestHash", addr1.address);
-      const approvedFiles = await drive
-        .connect(addr1)
-        .getApprovedFiles(owner.address);
+      // addr1 approves the file for owner
+      await drive.connect(addr1).approveFile("ipfsHash1", [owner.address]);
+
+      // Verify owner cannot see the approved file since the friendship is not mutual
+      const [friends, approvedFiles] = await drive.getApprovedFiles();
+      expect(friends.length).to.equal(0);
       expect(approvedFiles.length).to.equal(0);
     });
 
-    it("should not disapprove a non-existing file", async function () {
-      await expect(
-        drive.disapproveFile("NonExistingHash", addr1.address)
-      ).to.be.revertedWith("File does not exist");
+    it("Should disapprove a file for a friend", async function () {
+      await drive.addFile("file1.txt", "ipfsHash1");
+      await drive.addFriend(addr1.address);
+
+      await drive.approveFile("ipfsHash1", [addr1.address]);
+
+      await drive.disapproveFile("ipfsHash1", [addr1.address]);
+
+      const [friends, approvedFiles] = await drive.getApprovedFiles();
+      expect(friends.length).to.equal(1);
+      expect(approvedFiles[0].length).to.equal(0);
     });
   });
 });

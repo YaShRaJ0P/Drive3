@@ -14,8 +14,13 @@ export const App = () => {
   const [files, setFiles] = useState([]);
   const [friends, setFriends] = useState([]);
   const [friendAddress, setFriendAddress] = useState("");
-  const [approveFileModal, setApproveFileModal] = useState(false);
-  const [approvedFriends, setApprovedFriends] = useState([]);
+  const [approveFileModal, setApproveFileModal] = useState({
+    openModal: false,
+    ipfsHash: "",
+  });
+  const [selctedFriends, setSelctedFriends] = useState([]);
+  const [approvedFiles, setApprovedFiles] = useState([]);
+  const [friendsApprovalAddress, setFriendsApprovalAddress] = useState([]);
 
   const initializeEthers = async (ethereum) => {
     const provider = new ethers.BrowserProvider(ethereum);
@@ -44,6 +49,7 @@ export const App = () => {
       localStorage.setItem("connectedAccount", account);
       await getFiles(contract);
       await getFriends(contract);
+      await approvedFilesfromFriends(contract);
     } catch (error) {
       console.error("Error connecting to MetaMask:", error);
     }
@@ -64,6 +70,7 @@ export const App = () => {
         setAccount(storedAccount);
         await getFiles(contract);
         await getFriends(contract);
+        approvedFilesfromFriends(contract);
       }
     } catch (error) {
       console.error("Error fetching account from MetaMask:", error);
@@ -79,6 +86,7 @@ export const App = () => {
       const account = accounts[0];
       setAccount(account);
       localStorage.setItem("connectedAccount", account);
+      window.location.reload(false);
     }
   };
 
@@ -90,7 +98,7 @@ export const App = () => {
 
     try {
       const ipfsHash = await uploadFileToIPFS(file);
-      const transaction = await contract.addFile(ipfsHash);
+      const transaction = await contract.addFile(file.name, ipfsHash);
       await transaction.wait();
       await getFiles(contract);
       setFile(null);
@@ -229,10 +237,48 @@ export const App = () => {
   };
 
   const toggleApproval = (friend) => {
-    if (approvedFriends.includes(friend)) {
-      setApprovedFriends(approvedFriends.filter((f) => f !== friend));
+    if (selctedFriends.includes(friend)) {
+      setSelctedFriends(selctedFriends.filter((f) => f !== friend));
     } else {
-      setApprovedFriends([...approvedFriends, friend]);
+      setSelctedFriends([...selctedFriends, friend]);
+    }
+  };
+
+  const approveFile = async () => {
+    if (!selctedFriends[0] || !contract || !approveFileModal.openModal) {
+      return;
+    }
+    try {
+      const transaction = await contract.approveFile(
+        approveFileModal.ipfsHash,
+        selctedFriends
+      );
+      await transaction.wait();
+      setSelctedFriends([]);
+      setApproveFileModal({ openModal: false, ipfsHash: "" });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const approvedFilesfromFriends = async (contract) => {
+    try {
+      let files = await contract.getApprovedFiles();
+      if (files[1][0].length > 0) {
+        setApprovedFiles(files);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getFriendsApprovalStatus = async (ipfsHash) => {
+    try {
+      const approvalAddress = await contract.getFriendsApprovalStatus(ipfsHash);
+      setFriendsApprovalAddress(approvalAddress);
+      console.log(approvalAddress);
+    } catch (error) {
+      console.error("Error getting friends:", error);
     }
   };
 
@@ -260,15 +306,15 @@ export const App = () => {
     </div>
   ) : (
     <div className="min-h-screen max-w-screen bg-[#FFF9D0] flex flex-col gap-4 relative">
-      {approveFileModal && (
+      {approveFileModal.openModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-md shadow-md max-w-full text-center">
             <div className="flex flex-row justify-between items-center w-full mb-4">
               <h2 className="text-lg font-bold">Approve File</h2>
               <button
                 onClick={() => {
-                  setApproveFileModal(false);
-                  setApprovedFriends([]);
+                  setApproveFileModal({ openModal: false, ipfsHash: "" });
+                  setSelctedFriends([]);
                 }}
               >
                 <IoCloseSharp className="text-gray-400 hover:text-gray-600 transition-opacity duration-300 cursor-pointer" />
@@ -277,7 +323,7 @@ export const App = () => {
 
             <div className="flex flex-col gap-1">
               {friends.map((friend, index) =>
-                approvedFriends.includes(friend) ? (
+                selctedFriends.includes(friend) ? (
                   <div
                     key={index}
                     className="px-2 py-1 bg-green-500 rounded-md text-white font-semibold flex justify-center items-center gap-2"
@@ -312,7 +358,7 @@ export const App = () => {
             <button
               className="px-8 py-2 mt-1 rounded-full bg-gradient-to-b from-[#5AB2FF] to-[#A0DEFF] text-white focus:ring-2 focus:ring-[#CAF4FF] hover:shadow-xl hover:shadow-[#CAF4FF] transition duration-200"
               onClick={() => {
-                setApproveFileModal(false);
+                approveFile();
               }}
             >
               Approve
@@ -334,7 +380,11 @@ export const App = () => {
             type="file"
             name="file"
             id="file"
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={(e) => {
+              setFile(e.target.files[0]);
+              console.log(file);
+            }}
+            // key={this.state.inputKey}
           />
           <button
             type="submit"
@@ -354,13 +404,13 @@ export const App = () => {
                   src={`https://gateway.pinata.cloud/ipfs/${file.ipfsHash}`}
                   alt=""
                   className={`w-40 h-40 object-cover ${
-                    approveFileModal && "opacity-50"
+                    approveFileModal.openModal && "opacity-50"
                   } `}
                 />
                 <button
                   onClick={() => deleteFile(file.ipfsHash)}
                   className={`absolute top-0 right-0 mt-2 mr-2 rounded-full p-1 bg-gray-400 text-white flex justify-center items-center ${
-                    approveFileModal && "opacity-50"
+                    approveFileModal.openModal && "opacity-50"
                   }`}
                 >
                   <IoCloseSharp />
@@ -378,7 +428,13 @@ export const App = () => {
                   Download
                 </button>
                 <button
-                  onClick={() => setApproveFileModal(true)}
+                  onClick={() => {
+                    setApproveFileModal({
+                      openModal: true,
+                      ipfsHash: file.ipfsHash,
+                    });
+                    getFriendsApprovalStatus(file.ipfsHash);
+                  }}
                   className="mt-2 px-4 py-1 rounded-sm bg-gradient-to-b from-[#5AB2FF] to-[#A0DEFF] text-white focus:ring-2 focus:ring-[#CAF4FF] hover:shadow-xl hover:shadow-[#CAF4FF] transition duration-200"
                 >
                   Approve
@@ -425,6 +481,31 @@ export const App = () => {
             </div>
           ))}
         </div>
+      </section>
+      <section>
+        <h3 className="text-xl font-bold underline mb-2">FRIENDS' FILES</h3>
+        {approvedFiles.length > 0 &&
+          approvedFiles[0].map((friend, index) => (
+            <div key={index}>
+              <h4 className="font-semibold">
+                Friend {index + 1}: {friend}
+              </h4>
+              <ul className="list-disc list-inside">
+                {approvedFiles[1][index].map((file, fileIndex) => (
+                  <li key={fileIndex}>
+                    {file.fileName} - {file.ipfsHash}
+                    <img
+                      src={`https://gateway.pinata.cloud/ipfs/${file.ipfsHash}`}
+                      alt=""
+                      className={`w-40 h-40 object-cover ${
+                        approveFileModal.openModal && "opacity-50"
+                      } `}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
       </section>
     </div>
   );

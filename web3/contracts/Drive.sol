@@ -7,7 +7,6 @@ pragma solidity ^0.8.24;
  * @dev A contract for managing files stored on IPFS, with friend-based access control.
  */
 contract Drive {
-
     /// @notice structure of File
     struct File {
         string fileName;
@@ -143,7 +142,6 @@ contract Drive {
         address[] memory _friends
     ) external fileExists(_ipfsHash) {
         for (uint i = 0; i < _friends.length; i++) {
-
             //Revert if any listed friend is not user's friend
             address friend = _friends[i];
             bool isFriend = false;
@@ -197,7 +195,9 @@ contract Drive {
 
             require(isFriend, "Someone is not a friend");
 
-            string[] storage friendApprovedFileHashes = approvedFiles[msg.sender][friend];
+            string[] storage friendApprovedFileHashes = approvedFiles[
+                msg.sender
+            ][friend];
             bool found = false;
 
             // Disapprove the file
@@ -312,6 +312,7 @@ contract Drive {
     function addFriend(
         address _friend
     ) external validateFriendship(_friend, "Already a friend.", false) {
+        require(msg.sender != _friend, "You can't add yourself as your friend");
         userFriends[msg.sender].push(_friend);
     }
 
@@ -341,5 +342,16 @@ contract Drive {
     /// @return An array of friend addresses
     function getFriends() external view returns (address[] memory) {
         return userFriends[msg.sender];
+    }
+
+    /// @notice Returns the name
+    /// @param _address Address of the file owner
+    /// @param _ipfs IPFS of the file
+    /// @return The name of the file
+    function ipfsToName(
+        address _address,
+        string memory _ipfs
+    ) external view returns (string memory) {
+        return userFiles[_address][_ipfs].ipfsHash;
     }
 }

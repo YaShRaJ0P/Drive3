@@ -1,10 +1,9 @@
-import React from "react";
+import React, { memo } from "react";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { setModal } from "../appStore/modalSlice";
 
-export const Files = () => {
-  const modal = useSelector((state) => state.modal);
+export const Files = memo(() => {
   const files = useSelector((state) => state.files);
   const dispatch = useDispatch();
   const dialogBox = Object.freeze({
@@ -28,9 +27,7 @@ export const Files = () => {
               <img
                 src={`https://gateway.pinata.cloud/ipfs/${file.ipfsHash}`}
                 alt={file.fileName}
-                className={`text-black break-words w-full h-40 object-contain border-black ${
-                  modal.openModal && "opacity-50"
-                } `}
+                className="break-words w-full h-40 object-contain border-black text-gray-500"
               />
             </div>
             <p className="text-sm text-gray-500">
@@ -46,9 +43,7 @@ export const Files = () => {
                   })
                 )
               }
-              className={`absolute top-[-10px] right-[-8px] rounded-full p-1 bg-sky-400 hover:bg-sky-500 text-white flex justify-center items-center transition-all duration-200 ${
-                modal.openModal && "opacity-50"
-              }`}
+              className="absolute top-[-10px] right-[-8px] rounded-full p-1 bg-sky-400 hover:bg-sky-500 text-white flex justify-center items-center transition-all duration-200"
             >
               <IoEllipsisVertical />
             </button>
@@ -57,4 +52,4 @@ export const Files = () => {
       </div>
     </section>
   );
-};
+});

@@ -8,8 +8,13 @@ export const Navbar = () => {
   };
   return (
     <section className="text-white font-semibold p-3 border-b-2 border-b-[#C4FF5A] flex flex-row justify-between items-center">
-      <h1>DRIVE3</h1>
-      <h2>Connected Account : {truncateAddress(address)}</h2>
+      <h1 className="font-elianto tracking-widest text-lg">DRIVE3</h1>
+      <h2 title={address}>
+        Connected Account :{" "}
+        <span className="font-roboto tracking-wide">
+          {truncateAddress(address)}
+        </span>
+      </h2>
     </section>
   );
 };

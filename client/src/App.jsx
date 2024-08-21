@@ -97,7 +97,7 @@ export const App = () => {
       {account === "Not Connected" ? (
         <Homedisconnect />
       ) : (
-        <div className="min-h-screen max-w-screen bg-black text-white flex flex-col gap-4 relative px-2">
+        <div className="min-h-screen max-w-screen bg-black text-white flex flex-col gap-4 relative px-2 font-outfit">
           <Modalbox contract={contract} />
           <Navbar />
           <FileUpload contract={contract} />

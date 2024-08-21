@@ -1,9 +1,8 @@
-import React from "react";
+import React, { memo } from "react";
 import { useSelector } from "react-redux";
 import { downloadFile } from "../utils/functions";
 
-export const ApprovedFiles = () => {
-  const modal = useSelector((state) => state.modal);
+export const ApprovedFiles = memo(() => {
   const approvedFiles = useSelector((state) => state.approvedFiles);
 
   return (
@@ -16,7 +15,8 @@ export const ApprovedFiles = () => {
               approvedFiles[1][index].length > 0 && (
                 <div key={index}>
                   <h4 className="font-semibold mb-4">
-                    Friend {index + 1}: {friend}
+                    Friend {index + 1}:{" "}
+                    <span className="font-roboto tracking-wide">{friend}</span>
                   </h4>
                   <ul className="flex flex-row flex-wrap gap-2">
                     {approvedFiles[1][index].map((file, fileIndex) => (
@@ -27,9 +27,7 @@ export const ApprovedFiles = () => {
                         <img
                           src={`https://gateway.pinata.cloud/ipfs/${file.ipfsHash}`}
                           alt={file.fileName}
-                          className={`w- h-40 break-words text-black object-contain ${
-                            modal.openModal && "opacity-50"
-                          } `}
+                          className="w- h-40 break-words text-gray-500 object-contain"
                         />
                         <button
                           onClick={() => downloadFile(file.ipfsHash)}
@@ -46,4 +44,4 @@ export const ApprovedFiles = () => {
       </section>
     )
   );
-};
+});

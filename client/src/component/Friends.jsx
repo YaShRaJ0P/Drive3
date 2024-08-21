@@ -116,7 +116,7 @@ export const Friends = ({ contract }) => {
           id="address"
           value={friendAddress}
           onChange={(e) => setFriendAddress(e.target.value)}
-          className="h-full text-black px-1 py-1 w-[380px] rounded-sm"
+          className="h-full text-black px-1 py-1 w-[380px] rounded-sm font-roboto tracking-wide"
         />
         <button
           type="submit"
@@ -125,7 +125,7 @@ export const Friends = ({ contract }) => {
           Add
         </button>
       </form>
-      <div className="flex flex-row gap-2 flex-wrap max-sm:text-sm">
+      <div className="flex flex-row gap-2 flex-wrap max-sm:text-sm font-roboto tracking-wide">
         {friends.map((friend, index) => (
           <div
             key={index}

@@ -1,11 +1,10 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import { IoEllipsisVertical } from "react-icons/io5";
-import { useDispatch, useSelector } from "react-redux";
-import { setModal } from "../appStore/modalSlice";
+import { useAppContext } from "../utils/context";
 
 export const Files = memo(() => {
-  const files = useSelector((state) => state.files);
-  const dispatch = useDispatch();
+  const { files, updateModal } = useAppContext();
+
   const dialogBox = Object.freeze({
     CLOSE: 0,
     LIST: 1,
@@ -36,12 +35,10 @@ export const Files = memo(() => {
             </p>
             <button
               onClick={() =>
-                dispatch(
-                  setModal({
-                    ipfsHash: file.ipfsHash,
-                    openModal: dialogBox.LIST,
-                  })
-                )
+                updateModal({
+                  ipfsHash: file.ipfsHash,
+                  openModal: dialogBox.LIST,
+                })
               }
               className="absolute top-[-10px] right-[-8px] rounded-full p-1 bg-sky-400 hover:bg-sky-500 text-white flex justify-center items-center transition-all duration-200"
             >

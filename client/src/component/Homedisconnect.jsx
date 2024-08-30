@@ -1,15 +1,15 @@
 import React from "react";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
-import { setAccount } from "../appStore/accountStore";
 import {
   approvedFilesfromFriends,
   getFiles,
   getFriends,
   initializeEthers,
 } from "../utils/functions";
+import { useAppContext } from "../utils/context";
 export const Homedisconnect = () => {
-  const dispatch = useDispatch();
+  const { updateAccount } = useAppContext();
+
   const connectWallet = async () => {
     try {
       const { ethereum } = window;
@@ -27,7 +27,7 @@ export const Homedisconnect = () => {
 
       const contract = await initializeEthers(ethereum);
       //   setContract(contract);
-      dispatch(setAccount(account));
+      updateAccount(account);
 
       localStorage.setItem("connectedAccount", account);
       await getFiles(contract);

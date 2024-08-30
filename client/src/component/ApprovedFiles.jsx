@@ -1,11 +1,11 @@
 import React, { memo } from "react";
-import { useSelector } from "react-redux";
 import { downloadFile } from "../utils/functions";
+import { useAppContext } from "../utils/context";
 
 export const ApprovedFiles = memo(() => {
-  const approvedFiles = useSelector((state) => state.approvedFiles);
-
+  const { approvedFiles } = useAppContext();
   return (
+    approvedFiles &&
     approvedFiles.length > 0 && (
       <section>
         <h3 className="text-xl font-bold underline mb-4">FRIENDS' FILES</h3>

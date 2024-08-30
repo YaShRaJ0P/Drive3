@@ -2,13 +2,11 @@ import React from "react";
 import { IoCloseSharp, IoAddSharp } from "react-icons/io5";
 import { FaDownload, FaUserPlus, FaUserMinus } from "react-icons/fa";
 import { MdDeleteForever, MdKeyboardBackspace } from "react-icons/md";
-import { useDispatch, useSelector } from "react-redux";
-import { setModal } from "../appStore/modalSlice";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { downloadFile, getFiles } from "../utils/functions";
-import { setFiles } from "../appStore/filesSlice";
+import { useAppContext } from "../utils/context";
 
 const dialogBox = Object.freeze({
   CLOSE: 0,
@@ -18,9 +16,8 @@ const dialogBox = Object.freeze({
 });
 
 export const Modalbox = ({ contract }) => {
-  const dispatch = useDispatch();
-  const modal = useSelector((state) => state.modal);
-  const friends = useSelector((state) => state.friends);
+  const { modal, friends, account, updateFiles, updateModal } = useAppContext();
+
   const [selctedFriends, setSelctedFriends] = useState([]);
   const [friendsApprovalAddress, setFriendsApprovalAddress] = useState(null);
 
@@ -52,7 +49,7 @@ export const Modalbox = ({ contract }) => {
           await transaction.wait();
           await unpinFromIPFS(ipfsHash);
           let files = await getFiles(contract);
-          dispatch(setFiles(files));
+          updateFiles(files);
           return "File deleted successfully!";
         } catch (err) {
           if (err.code === "ACTION_REJECTED") {
@@ -102,12 +99,10 @@ export const Modalbox = ({ contract }) => {
           );
           await transaction.wait();
           setSelctedFriends([]);
-          dispatch(
-            setModal({
-              openModal: dialogBox.CLOSE,
-              ipfsHash: "",
-            })
-          );
+          updateModal({
+            openModal: dialogBox.CLOSE,
+            ipfsHash: "",
+          });
         } catch (err) {
           if (err.code === "ACTION_REJECTED") {
             errorMessage = "Approving file denied!";
@@ -156,12 +151,10 @@ export const Modalbox = ({ contract }) => {
           );
           await transaction.wait();
           setFriendsApprovalAddress(null);
-          dispatch(
-            setModal({
-              openModal: dialogBox.CLOSE,
-              ipfsHash: "",
-            })
-          );
+          updateModal({
+            openModal: dialogBox.CLOSE,
+            ipfsHash: "",
+          });
         } catch (err) {
           if (err.code === "ACTION_REJECTED") {
             errorMessage = "Disapproving file denied!";
@@ -223,12 +216,10 @@ export const Modalbox = ({ contract }) => {
                 <button
                   className="flex items-center justify-center"
                   onClick={() => {
-                    dispatch(
-                      setModal({
-                        openModal: dialogBox.CLOSE,
-                        ipfsHash: "",
-                      })
-                    );
+                    updateModal({
+                      openModal: dialogBox.CLOSE,
+                      ipfsHash: "",
+                    });
                   }}
                 >
                   <IoCloseSharp className="text-black hover:text-red-500 text-xl transition-all duration-200 cursor-pointer" />
@@ -238,7 +229,7 @@ export const Modalbox = ({ contract }) => {
             <li className="border-b-2 border-b-black p-[10px] hover:bg-zinc-900 hover:text-white transition-all duration-200">
               <button
                 className="w-full text-left flex flex-row gap-2 justify-start items-center font-medium"
-                onClick={() => downloadFile(modal.ipfsHash)}
+                onClick={() => downloadFile(modal.ipfsHash, contract, account)}
               >
                 <FaDownload className=" text-lg" /> <span> Download</span>
               </button>
@@ -254,12 +245,10 @@ export const Modalbox = ({ contract }) => {
                         true
                       );
                       isOpenModal &&
-                        dispatch(
-                          setModal({
-                            ...modal,
-                            openModal: dialogBox.APPROVE_FILE,
-                          })
-                        );
+                        updateModal({
+                          ...modal,
+                          openModal: dialogBox.APPROVE_FILE,
+                        });
                     }}
                   >
                     <FaUserPlus className=" text-lg" />{" "}
@@ -275,12 +264,10 @@ export const Modalbox = ({ contract }) => {
                         false
                       );
                       isOpenModal &&
-                        dispatch(
-                          setModal({
-                            ...modal,
-                            openModal: dialogBox.DISAPPROVE_FILE,
-                          })
-                        );
+                        updateModal({
+                          ...modal,
+                          openModal: dialogBox.DISAPPROVE_FILE,
+                        });
                     }}
                   >
                     <FaUserMinus className=" text-lg" />
@@ -307,12 +294,10 @@ export const Modalbox = ({ contract }) => {
             <div className="flex flex-row justify-between items-center w-full mb-4">
               <button
                 onClick={() => {
-                  dispatch(
-                    setModal({
-                      ...modal,
-                      openModal: dialogBox.LIST,
-                    })
-                  );
+                  updateModal({
+                    ...modal,
+                    openModal: dialogBox.LIST,
+                  });
                   setSelctedFriends([]);
                   setFriendsApprovalAddress(null);
                 }}
@@ -322,12 +307,10 @@ export const Modalbox = ({ contract }) => {
               <h2 className="text-lg font-bold text-black">Approve File</h2>
               <button
                 onClick={() => {
-                  dispatch(
-                    setModal({
-                      openModal: dialogBox.CLOSE,
-                      ipfsHash: "",
-                    })
-                  );
+                  updateModal({
+                    openModal: dialogBox.CLOSE,
+                    ipfsHash: "",
+                  });
                   setSelctedFriends([]);
                   setFriendsApprovalAddress(null);
                 }}
@@ -386,12 +369,10 @@ export const Modalbox = ({ contract }) => {
             <div className="flex flex-row justify-between items-center w-full mb-4">
               <button
                 onClick={() => {
-                  dispatch(
-                    setModal({
-                      ...modal,
-                      openModal: dialogBox.LIST,
-                    })
-                  );
+                  updateModal({
+                    ...modal,
+                    openModal: dialogBox.LIST,
+                  });
                   setSelctedFriends([]);
                   setFriendsApprovalAddress(null);
                 }}
@@ -401,12 +382,10 @@ export const Modalbox = ({ contract }) => {
               <h2 className="text-lg font-bold text-black">Disapprove File</h2>
               <button
                 onClick={() => {
-                  dispatch(
-                    setModal({
-                      openModal: dialogBox.CLOSE,
-                      ipfsHash: "",
-                    })
-                  );
+                  updateModal({
+                    openModal: dialogBox.CLOSE,
+                    ipfsHash: "",
+                  });
                   setSelctedFriends([]);
                   setFriendsApprovalAddress(null);
                 }}

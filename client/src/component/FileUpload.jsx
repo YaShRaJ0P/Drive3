@@ -5,11 +5,10 @@ import FormData from "form-data";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { getFiles } from "../utils/functions";
-import { useDispatch } from "react-redux";
-import { setFiles } from "../appStore/filesSlice";
+import { useAppContext } from "../utils/context";
 
 export const FileUpload = ({ contract }) => {
-  const dispatch = useDispatch();
+  const { updateFiles } = useAppContext();
   const [file, setFile] = useState(null);
   const [dragging, setDragging] = useState(false);
 
@@ -39,7 +38,7 @@ export const FileUpload = ({ contract }) => {
           const transaction = await contract.addFile(file.name, ipfsHash);
           await transaction.wait();
           let files = await getFiles(contract);
-          dispatch(setFiles(files));
+          updateFiles(files);
           setFile(null);
           return "File uploaded successfully!";
         } catch (err) {

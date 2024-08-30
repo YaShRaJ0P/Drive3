@@ -3,15 +3,12 @@ import { IoCloseSharp } from "react-icons/io5";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { approvedFilesfromFriends, getFriends } from "../utils/functions";
-import { useDispatch, useSelector } from "react-redux";
-import { setFriends } from "../appStore/friendsSlice";
-import { setApprovedfiles } from "../appStore/approvedfilesSlice";
+import { useAppContext } from "../utils/context";
 
 export const Friends = ({ contract }) => {
-  const friends = useSelector((state) => state.friends);
   const [friendAddress, setFriendAddress] = useState("");
-  const account = useSelector((state) => state.account);
-  const dispatch = useDispatch();
+  const { friends, account, updateFriends, updateApprovedFiles } =
+    useAppContext();
   const addFriend = async (e) => {
     e.preventDefault();
     if (!contract) {
@@ -40,10 +37,10 @@ export const Friends = ({ contract }) => {
           const transaction = await contract.addFriend(friendAddress);
           await transaction.wait();
           let friends = await getFriends(contract);
-          dispatch(setFriends(friends));
-          setFriendAddress(null);
+          updateFriends(friends);
+          setFriendAddress("");
           let approvedFiles = await approvedFilesfromFriends(contract);
-          dispatch(setApprovedfiles(approvedFiles));
+          updateApprovedFiles(approvedFiles);
         } catch (err) {
           if (err.code === "ACTION_REJECTED") {
             errorMessage = "Friend adding denied!";
@@ -83,7 +80,7 @@ export const Friends = ({ contract }) => {
           const transaction = await contract.removeFriend(friendAddress);
           await transaction.wait();
           let friends = await getFriends(contract);
-          setFriends(friends);
+          updateFriends(friends);
           await approvedFilesfromFriends(contract);
         } catch (err) {
           if (err.code === "ACTION_REJECTED") {
@@ -115,7 +112,10 @@ export const Friends = ({ contract }) => {
           name="address"
           id="address"
           value={friendAddress}
-          onChange={(e) => setFriendAddress(e.target.value)}
+          onChange={(e) => {
+            setFriendAddress(e.target.value);
+            console.log(e);
+          }}
           className="h-full text-black px-1 py-1 w-[380px] rounded-sm font-roboto tracking-wide"
         />
         <button

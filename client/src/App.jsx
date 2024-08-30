@@ -13,16 +13,17 @@ import {
   getFriends,
   initializeEthers,
 } from "./utils/functions";
-import { useDispatch, useSelector } from "react-redux";
-import { setAccount } from "./appStore/accountStore";
-import { setFiles } from "./appStore/filesSlice";
-import { setFriends } from "./appStore/friendsSlice";
-import { setApprovedfiles } from "./appStore/approvedfilesSlice";
+import { useAppContext } from "./utils/context";
 
 export const App = () => {
   const [contract, setContract] = useState(null);
-  const dispatch = useDispatch();
-  const account = useSelector((state) => state.account);
+  const {
+    account,
+    updateAccount,
+    updateFiles,
+    updateFriends,
+    updateApprovedFiles,
+  } = useAppContext();
 
   const checkConnectedAccount = async () => {
     try {
@@ -38,14 +39,13 @@ export const App = () => {
       if (storedAccount) {
         const contract = await initializeEthers(ethereum);
         setContract(contract);
-        dispatch(setAccount(storedAccount));
-
+        updateAccount(storedAccount);
         let files = await getFiles(contract);
-        dispatch(setFiles(files));
+        updateFiles(files);
         let friends = await getFriends(contract);
-        dispatch(setFriends(friends));
+        updateFriends(friends);
         let approvedFiles = await approvedFilesfromFriends(contract);
-        dispatch(setApprovedfiles(approvedFiles));
+        updateApprovedFiles(approvedFiles);
       }
     } catch (error) {
       console.error("Error fetching account from MetaMask:", error);
@@ -56,16 +56,16 @@ export const App = () => {
   const handleAccountsChanged = (accounts) => {
     if (accounts.length === 0) {
       localStorage.removeItem("connectedAccount");
-      dispatch(setAccount("Not Connected"));
-      dispatch(setFiles([]));
-      dispatch(setFriends([]));
-      dispatch(setApprovedfiles([]));
+      updateAccount("Not Connected");
+      updateFiles([]);
+      updateFriends([]);
+      updateApprovedFiles([]);
       toast.success("Wallet disconnected!", {
         id: "connect-wallet",
       });
     } else {
       const account = accounts[0];
-      dispatch(setAccount(account));
+      updateAccount(account);
       localStorage.setItem("connectedAccount", account);
       window.location.reload(false);
       toast.success("Wallet connected successfully!", {

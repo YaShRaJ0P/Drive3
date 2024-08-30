@@ -32,7 +32,7 @@ export const getFriends = async (contract) => {
   }
 };
 
-export const downloadFile = async (ipfsHash) => {
+export const downloadFile = async (ipfsHash, contract, address) => {
   const url = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
 
   //Make a function to find file using ipfsHash and download it by the name of that file
@@ -43,12 +43,12 @@ export const downloadFile = async (ipfsHash) => {
       throw new Error("Network response was not ok");
     }
     const blob = await response.blob();
-    console.log(response);
     const link = document.createElement("a");
     const downloadUrl = URL.createObjectURL(blob);
     link.href = downloadUrl;
     console.log(downloadUrl);
-    link.setAttribute("download", ipfsHash);
+    const fileName = await contract.ipfsToName(address, ipfsHash);
+    link.setAttribute("download", fileName);
     document.body.appendChild(link);
     link.click();
     URL.revokeObjectURL(downloadUrl);

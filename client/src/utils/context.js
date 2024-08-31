@@ -17,7 +17,7 @@ const defaultProvider = {
   friends: [],
   files: [],
   approvedFiles: [],
-  account: "",
+  account: "Not Connected",
 };
 
 // Create the context

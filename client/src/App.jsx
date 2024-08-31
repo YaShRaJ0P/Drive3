@@ -25,6 +25,14 @@ export const App = () => {
     updateApprovedFiles,
   } = useAppContext();
 
+  const setAccountToLocalStorage = (account) => {
+    if (account) {
+      localStorage.setItem("connectedAccount", account);
+    } else {
+      localStorage.removeItem("connectedAccount");
+    }
+  };
+
   const checkConnectedAccount = async () => {
     try {
       const { ethereum } = window;
@@ -35,27 +43,51 @@ export const App = () => {
         return;
       }
 
-      const storedAccount = localStorage.getItem("connectedAccount");
-      if (storedAccount) {
-        const contract = await initializeEthers(ethereum);
-        setContract(contract);
-        updateAccount(storedAccount);
-        let files = await getFiles(contract);
-        updateFiles(files);
-        let friends = await getFriends(contract);
-        updateFriends(friends);
-        let approvedFiles = await approvedFilesfromFriends(contract);
-        updateApprovedFiles(approvedFiles);
+      const accounts = await ethereum.request({ method: "eth_accounts" });
+      if (accounts.length > 0) {
+        const currentAccount = accounts[0];
+        const storedAccount = localStorage.getItem("connectedAccount");
+
+        // If no mismatch and a valid account exists, initialize and fetch data
+        if (!storedAccount || storedAccount === currentAccount) {
+          const contract = await initializeEthers(ethereum);
+          setContract(contract);
+          updateAccount(currentAccount);
+          setAccountToLocalStorage(currentAccount);
+
+          // Fetch files, friends, and approved files
+          const [files, friends, approvedFiles] = await Promise.all([
+            getFiles(contract),
+            getFriends(contract),
+            approvedFilesfromFriends(contract),
+          ]);
+
+          updateFiles(files);
+          updateFriends(friends);
+          updateApprovedFiles(approvedFiles);
+        } else {
+          // Handle mismatch
+          setAccountToLocalStorage(null);
+          updateAccount("Not Connected");
+          toast.error("Account mismatch detected. Please reconnect.", {
+            id: "connect-wallet",
+          });
+        }
+      } else {
+        // No accounts connected
+        setAccountToLocalStorage(null);
+        updateAccount("Not Connected");
       }
     } catch (error) {
       console.error("Error fetching account from MetaMask:", error);
-      localStorage.removeItem("connectedAccount");
+      setAccountToLocalStorage(null);
     }
   };
 
-  const handleAccountsChanged = (accounts) => {
+  const handleAccountsChanged = async (accounts) => {
     if (accounts.length === 0) {
-      localStorage.removeItem("connectedAccount");
+      // If the user disconnects their account
+      setAccountToLocalStorage(null);
       updateAccount("Not Connected");
       updateFiles([]);
       updateFriends([]);
@@ -66,30 +98,45 @@ export const App = () => {
     } else {
       const account = accounts[0];
       updateAccount(account);
-      localStorage.setItem("connectedAccount", account);
-      window.location.reload(false);
+      setAccountToLocalStorage(account);
       toast.success("Wallet connected successfully!", {
         id: "connect-wallet",
       });
+
+      if (contract) {
+        // Re-fetch data for the new account
+        const [files, friends, approvedFiles] = await Promise.all([
+          getFiles(contract),
+          getFriends(contract),
+          approvedFilesfromFriends(contract),
+        ]);
+
+        updateFiles(files);
+        updateFriends(friends);
+        updateApprovedFiles(approvedFiles);
+      }
     }
   };
 
   useEffect(() => {
-    async function fetchData() {
+    const { ethereum } = window;
+
+    const fetchData = async () => {
       await checkConnectedAccount();
-      const { ethereum } = window;
+
       if (ethereum) {
         ethereum.on("accountsChanged", handleAccountsChanged);
       }
+    };
 
-      return () => {
-        if (ethereum) {
-          ethereum.removeListener("accountsChanged", handleAccountsChanged);
-        }
-      };
-    }
     fetchData();
-  }, []);
+
+    return () => {
+      if (ethereum) {
+        ethereum.removeListener("accountsChanged", handleAccountsChanged);
+      }
+    };
+  }, [contract]);
 
   return (
     <>

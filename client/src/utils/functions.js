@@ -48,6 +48,7 @@ export const downloadFile = async (ipfsHash, contract, address) => {
     link.href = downloadUrl;
     console.log(downloadUrl);
     const fileName = await contract.ipfsToName(address, ipfsHash);
+    console.log(fileName);
     link.setAttribute("download", fileName);
     document.body.appendChild(link);
     link.click();

@@ -352,6 +352,6 @@ contract Drive {
         address _address,
         string memory _ipfs
     ) external view returns (string memory) {
-        return userFiles[_address][_ipfs].ipfsHash;
+        return userFiles[_address][_ipfs].fileName;
     }
 }

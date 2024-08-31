@@ -81,7 +81,8 @@ export const Friends = ({ contract }) => {
           await transaction.wait();
           let friends = await getFriends(contract);
           updateFriends(friends);
-          await approvedFilesfromFriends(contract);
+          let approvedFiles = await approvedFilesfromFriends(contract);
+          updateApprovedFiles(approvedFiles);
         } catch (err) {
           if (err.code === "ACTION_REJECTED") {
             errorMessage = "Friend removing denied!";

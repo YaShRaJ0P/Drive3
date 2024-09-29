@@ -208,9 +208,9 @@ export const Modalbox = ({ contract }) => {
   return (
     <>
       {modal.openModal === dialogBox.LIST && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <ul className="bg-white text-black w-96 rounded-md shadow-md flex flex-col justify-center">
-            <li className="flex justify-between items-center border-b-2 border-b-black w-full font-bold text-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <ul className="flex flex-col justify-center text-black bg-white rounded-md shadow-md w-96">
+            <li className="flex items-center justify-between w-full text-lg font-bold border-b-2 border-b-black">
               <h4 className="px-2 py-[6px]">Action</h4>
               <div className="pr-2">
                 <button
@@ -222,23 +222,23 @@ export const Modalbox = ({ contract }) => {
                     });
                   }}
                 >
-                  <IoCloseSharp className="text-black hover:text-red-500 text-xl transition-all duration-200 cursor-pointer" />
+                  <IoCloseSharp className="text-xl text-black transition-all duration-200 cursor-pointer hover:text-red-500" />
                 </button>
               </div>
             </li>
             <li className="border-b-2 border-b-black p-[10px] hover:bg-zinc-900 hover:text-white transition-all duration-200">
               <button
-                className="w-full text-left flex flex-row gap-2 justify-start items-center font-medium"
+                className="flex flex-row items-center justify-start w-full gap-2 font-medium text-left"
                 onClick={() => downloadFile(modal.ipfsHash, contract, account)}
               >
-                <FaDownload className=" text-lg" /> <span> Download</span>
+                <FaDownload className="text-lg " /> <span> Download</span>
               </button>
             </li>
             {friends.length > 0 && (
               <>
                 <li className="border-b-2 border-b-black p-[10px] hover:bg-zinc-900 hover:text-white transition-all duration-200">
                   <button
-                    className="w-full text-left flex flex-row gap-2 justify-start items-center font-medium"
+                    className="flex flex-row items-center justify-start w-full gap-2 font-medium text-left"
                     onClick={async () => {
                       let isOpenModal = await getFriendsApprovalStatus(
                         modal.ipfsHash,
@@ -251,13 +251,13 @@ export const Modalbox = ({ contract }) => {
                         });
                     }}
                   >
-                    <FaUserPlus className=" text-lg" />{" "}
+                    <FaUserPlus className="text-lg " />{" "}
                     <span> Approve File</span>
                   </button>
                 </li>
                 <li className="border-b-2 border-b-black p-[10px] hover:bg-zinc-900 hover:text-white transition-all duration-200">
                   <button
-                    className="w-full text-left flex flex-row gap-2 justify-start items-center font-medium"
+                    className="flex flex-row items-center justify-start w-full gap-2 font-medium text-left"
                     onClick={async () => {
                       let isOpenModal = await getFriendsApprovalStatus(
                         modal.ipfsHash,
@@ -270,7 +270,7 @@ export const Modalbox = ({ contract }) => {
                         });
                     }}
                   >
-                    <FaUserMinus className=" text-lg" />
+                    <FaUserMinus className="text-lg " />
                     <span> Disapprove File</span>
                   </button>
                 </li>
@@ -278,10 +278,10 @@ export const Modalbox = ({ contract }) => {
             )}
             <li className="p-[10px] hover:bg-zinc-900 hover:text-white transition duration-200">
               <button
-                className="w-full text-left flex flex-row gap-2 justify-start items-center font-medium"
+                className="flex flex-row items-center justify-start w-full gap-2 font-medium text-left"
                 onClick={() => deleteFile(modal.ipfsHash)}
               >
-                <MdDeleteForever className=" text-lg" />
+                <MdDeleteForever className="text-lg " />
                 <span> Delete</span>
               </button>
             </li>
@@ -289,9 +289,9 @@ export const Modalbox = ({ contract }) => {
         </div>
       )}
       {modal.openModal === dialogBox.APPROVE_FILE && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-md shadow-md max-w-full text-center">
-            <div className="flex flex-row justify-between items-center w-full mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="max-w-full p-6 text-center bg-white rounded-md shadow-md">
+            <div className="flex flex-row items-center justify-between w-full mb-4">
               <button
                 onClick={() => {
                   updateModal({
@@ -302,7 +302,7 @@ export const Modalbox = ({ contract }) => {
                   setFriendsApprovalAddress(null);
                 }}
               >
-                <MdKeyboardBackspace className="text-black hover:text-teal-500 transition-all duration-200 cursor-pointer text-2xl" />
+                <MdKeyboardBackspace className="text-2xl text-black transition-all duration-200 cursor-pointer hover:text-teal-500" />
               </button>
               <h2 className="text-lg font-bold text-black">Approve File</h2>
               <button
@@ -315,7 +315,7 @@ export const Modalbox = ({ contract }) => {
                   setFriendsApprovalAddress(null);
                 }}
               >
-                <IoCloseSharp className="text-black hover:text-red-500 transition-all duration-200 cursor-pointer text-2xl" />
+                <IoCloseSharp className="text-2xl text-black transition-all duration-200 cursor-pointer hover:text-red-500" />
               </button>
             </div>
 
@@ -325,12 +325,12 @@ export const Modalbox = ({ contract }) => {
                   selctedFriends.includes(friend) ? (
                     <div
                       key={index}
-                      className="pl-2 bg-green-500 border-green-500 border rounded-md text-white font-semibold flex justify-center items-center gap-2"
+                      className="flex items-center justify-center gap-2 pl-2 font-semibold text-white bg-green-500 border border-green-500 rounded-md"
                     >
                       <span className="py-[6px]">{friend}</span>
                       <button
                         onClick={() => toggleApproval(friend)}
-                        className="text-white flex justify-center items-center bg-green-600 h-full text-2xl rounded-r-md p-2 hover:bg-white hover:text-green-600"
+                        className="flex items-center justify-center h-full p-2 text-2xl text-white bg-green-600 rounded-r-md hover:bg-white hover:text-green-600"
                       >
                         <IoCloseSharp className="font-semibold" />
                       </button>
@@ -338,14 +338,14 @@ export const Modalbox = ({ contract }) => {
                   ) : (
                     <div
                       key={index}
-                      className="pl-2 bg-red-500 border-red-500 border rounded-md text-white font-semibold flex justify-center items-center gap-2"
+                      className="flex items-center justify-center gap-2 pl-2 font-semibold text-white bg-red-500 border border-red-500 rounded-md"
                     >
                       <span className="py-[6px]">{friend}</span>
                       <button
                         onClick={() => toggleApproval(friend)}
-                        className="text-white flex justify-center items-center bg-red-600 h-full text-2xl rounded-r-md p-2 hover:bg-white hover:text-red-600"
+                        className="flex items-center justify-center h-full p-2 text-2xl text-white bg-red-600 rounded-r-md hover:bg-white hover:text-red-600"
                       >
-                        <IoAddSharp className="font-semibold h-full" />
+                        <IoAddSharp className="h-full font-semibold" />
                       </button>
                     </div>
                   )
@@ -364,9 +364,9 @@ export const Modalbox = ({ contract }) => {
         </div>
       )}
       {modal.openModal === dialogBox.DISAPPROVE_FILE && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-md shadow-md max-w-full text-center">
-            <div className="flex flex-row justify-between items-center w-full mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="max-w-full p-6 text-center bg-white rounded-md shadow-md">
+            <div className="flex flex-row items-center justify-between w-full mb-4">
               <button
                 onClick={() => {
                   updateModal({
@@ -377,7 +377,7 @@ export const Modalbox = ({ contract }) => {
                   setFriendsApprovalAddress(null);
                 }}
               >
-                <MdKeyboardBackspace className="text-black hover:text-teal-500 transition-all duration-200 cursor-pointer text-2xl" />
+                <MdKeyboardBackspace className="text-2xl text-black transition-all duration-200 cursor-pointer hover:text-teal-500" />
               </button>
               <h2 className="text-lg font-bold text-black">Disapprove File</h2>
               <button
@@ -390,7 +390,7 @@ export const Modalbox = ({ contract }) => {
                   setFriendsApprovalAddress(null);
                 }}
               >
-                <IoCloseSharp className="text-black hover:text-red-500 transition-all duration-200 cursor-pointer text-2xl" />
+                <IoCloseSharp className="text-2xl text-black transition-all duration-200 cursor-pointer hover:text-red-500" />
               </button>
             </div>
 
@@ -400,12 +400,12 @@ export const Modalbox = ({ contract }) => {
                   selctedFriends.includes(friend) ? (
                     <div
                       key={index}
-                      className="pl-2 bg-green-500 border-green-500 border rounded-md text-white font-semibold flex justify-center items-center gap-2"
+                      className="flex items-center justify-center gap-2 pl-2 font-semibold text-white bg-green-500 border border-green-500 rounded-md"
                     >
                       <span className="py-[6px]">{friend}</span>
                       <button
                         onClick={() => toggleApproval(friend)}
-                        className="text-white flex justify-center items-center bg-green-600 h-full text-2xl rounded-r-md p-2 hover:bg-white hover:text-green-600"
+                        className="flex items-center justify-center h-full p-2 text-2xl text-white bg-green-600 rounded-r-md hover:bg-white hover:text-green-600"
                       >
                         <IoCloseSharp className="font-semibold" />
                       </button>
@@ -413,12 +413,12 @@ export const Modalbox = ({ contract }) => {
                   ) : (
                     <div
                       key={index}
-                      className="pl-2 bg-red-500 border-red-500 border rounded-md text-white font-semibold flex justify-center items-center gap-2"
+                      className="flex items-center justify-center gap-2 pl-2 font-semibold text-white bg-red-500 border border-red-500 rounded-md"
                     >
                       <span className="py-[6px]">{friend}</span>
                       <button
                         onClick={() => toggleApproval(friend)}
-                        className="text-white flex justify-center items-center bg-red-600 h-full text-2xl rounded-r-md p-2 hover:bg-white hover:text-red-600"
+                        className="flex items-center justify-center h-full p-2 text-2xl text-white bg-red-600 rounded-r-md hover:bg-white hover:text-red-600"
                       >
                         <IoAddSharp className="font-semibold" />
                       </button>

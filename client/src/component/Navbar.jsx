@@ -7,10 +7,10 @@ export const Navbar = () => {
   };
   return (
     <section className="text-white font-semibold p-3 border-b-2 border-b-[#C4FF5A] flex flex-row justify-between items-center">
-      <h1 className="font-elianto tracking-widest text-lg">DRIVE3</h1>
+      <h1 className="text-lg tracking-widest font-elianto">DRIVE3</h1>
       <h2 title={account}>
         Connected Account :{" "}
-        <span className="font-roboto tracking-wide">
+        <span className="tracking-wide font-roboto">
           {truncateAddress(account)}
         </span>
       </h2>

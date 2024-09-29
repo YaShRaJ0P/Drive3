@@ -11,7 +11,9 @@ export const initializeEthers = async (ethereum) => {
 
 export const getFiles = async (contract) => {
   try {
+    console.log("files");
     const files = await contract.getAllFiles();
+    console.log(files);
     return files;
   } catch (error) {
     toast.error("Error fetching files!", {
@@ -22,7 +24,9 @@ export const getFiles = async (contract) => {
 
 export const getFriends = async (contract) => {
   try {
+    console.log("friends");
     const friends = await contract.getFriends();
+    console.log(friends);
     return friends;
   } catch (error) {
     toast.error("Error fetching friends!", {
@@ -67,7 +71,9 @@ export const downloadFile = async (ipfsHash, contract, address) => {
 
 export const approvedFilesfromFriends = async (contract) => {
   try {
+    console.log("approved");
     let files = await contract.getApprovedFiles();
+    console.log(files);
     if (files[1].length > 0 && files[1][0].length > 0) {
       return files;
     }

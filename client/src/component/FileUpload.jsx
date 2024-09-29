@@ -89,7 +89,7 @@ export const FileUpload = ({ contract }) => {
     <section className="w-full">
       <form
         onSubmit={uploadFile}
-        className="flex flex-col justify-center items-center gap-6 w-full"
+        className="flex flex-col items-center justify-center w-full gap-6"
       >
         <FileUploader
           handleChange={(file) => {
@@ -106,13 +106,13 @@ export const FileUpload = ({ contract }) => {
                 </div>
               ) : file ? (
                 <div className="w-[60vw] bg-slate-950 h-64 text-2xl font-semibold hover:cursor-pointer border-sky-500 rounded-lg border-dashed border-4 flex justify-center items-center flex-col gap-2 transition-all duration-200 max-sm:w-[90vw] max-sm:mx-2">
-                  <div className="break-words text-base">{file.name}</div>
-                  <div className="text-gray-500 bg-black relative text-sm">
-                    <div className="bg-black px-1 z-10 relative">OR</div>
+                  <div className="text-base break-words">{file.name}</div>
+                  <div className="relative text-sm text-gray-500 bg-black">
+                    <div className="relative z-10 px-1 bg-black">OR</div>
                     <div className="absolute px-14 bg-gray-500 h-[1px] -translate-x-1/2 left-1/2 top-1/2 -translate-y-1/2"></div>
                   </div>
                   <div className="text-sm">
-                    <span className=" underline text-sky-500">Select</span>{" "}
+                    <span className="underline  text-sky-500">Select</span>{" "}
                     another file.
                   </div>
                 </div>

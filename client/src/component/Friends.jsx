@@ -103,10 +103,10 @@ export const Friends = ({ contract }) => {
 
   return (
     <section>
-      <h3 className="text-xl font-bold underline mb-4">FRIENDS</h3>
+      <h3 className="mb-4 text-xl font-bold underline">FRIENDS</h3>
       <form
         onSubmit={addFriend}
-        className="flex flex-row justify-center items-center gap-6 h-10 mb-4"
+        className="flex flex-row items-center justify-center h-10 gap-6 mb-4"
       >
         <input
           type="text"
@@ -126,21 +126,22 @@ export const Friends = ({ contract }) => {
           Add
         </button>
       </form>
-      <div className="flex flex-row gap-2 flex-wrap max-sm:text-sm font-roboto tracking-wide">
-        {friends.map((friend, index) => (
-          <div
-            key={index}
-            className="pl-2 bg-sky-400 rounded-md text-white font-semibold flex justify-center items-center gap-2"
-          >
-            <span className="py-[6px]">{friend}</span>
-            <button
-              onClick={() => removeFriend(friend)}
-              className="text-white flex justify-center items-center text-lg h-full bg-sky-500 p-2 rounded-r-md hover:text-sky-500 hover:bg-white transition duration-200"
+      <div className="flex flex-row flex-wrap gap-2 tracking-wide max-sm:text-sm font-roboto">
+        {friends &&
+          friends.map((friend, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-center gap-2 pl-2 font-semibold text-white rounded-md bg-sky-400"
             >
-              <IoCloseSharp className="font-semibold" />
-            </button>
-          </div>
-        ))}
+              <span className="py-[6px]">{friend}</span>
+              <button
+                onClick={() => removeFriend(friend)}
+                className="flex items-center justify-center h-full p-2 text-lg text-white transition duration-200 bg-sky-500 rounded-r-md hover:text-sky-500 hover:bg-white"
+              >
+                <IoCloseSharp className="font-semibold" />
+              </button>
+            </div>
+          ))}
       </div>
     </section>
   );

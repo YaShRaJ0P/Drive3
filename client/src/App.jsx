@@ -7,6 +7,7 @@ import { FileUpload } from "./component/FileUpload";
 import { Files } from "./component/Files";
 import { Friends } from "./component/Friends";
 import { ApprovedFiles } from "./component/ApprovedFiles";
+import { ethers } from "ethers";
 import {
   approvedFilesfromFriends,
   getFiles,
@@ -25,14 +26,6 @@ export const App = () => {
     updateApprovedFiles,
   } = useAppContext();
 
-  const setAccountToLocalStorage = (account) => {
-    if (account) {
-      localStorage.setItem("connectedAccount", account);
-    } else {
-      localStorage.removeItem("connectedAccount");
-    }
-  };
-
   const checkConnectedAccount = async () => {
     try {
       const { ethereum } = window;
@@ -43,100 +36,91 @@ export const App = () => {
         return;
       }
 
-      const accounts = await ethereum.request({ method: "eth_accounts" });
+      let storedAccount;
+
+      const provider = new ethers.BrowserProvider(ethereum);
+      const accounts = await provider.listAccounts();
+
       if (accounts.length > 0) {
-        const currentAccount = accounts[0];
-        const storedAccount = localStorage.getItem("connectedAccount");
-
-        // If no mismatch and a valid account exists, initialize and fetch data
-        if (!storedAccount || storedAccount === currentAccount) {
-          const contract = await initializeEthers(ethereum);
-          setContract(contract);
-          updateAccount(currentAccount);
-          setAccountToLocalStorage(currentAccount);
-
-          // Fetch files, friends, and approved files
-          const [files, friends, approvedFiles] = await Promise.all([
-            getFiles(contract),
-            getFriends(contract),
-            approvedFilesfromFriends(contract),
-          ]);
-
-          updateFiles(files);
-          updateFriends(friends);
-          updateApprovedFiles(approvedFiles);
-        } else {
-          // Handle mismatch
-          setAccountToLocalStorage(null);
-          updateAccount("Not Connected");
-          toast.error("Account mismatch detected. Please reconnect.", {
-            id: "connect-wallet",
-          });
-        }
+        console.log("Connected to MetaMask:", accounts[0]);
+        storedAccount = accounts[0].address;
       } else {
-        // No accounts connected
-        setAccountToLocalStorage(null);
-        updateAccount("Not Connected");
+        console.log("MetaMask is installed but not connected.");
+      }
+
+      if (storedAccount) {
+        const currentContract = await initializeEthers(ethereum);
+        setContract(currentContract);
+        updateAccount(storedAccount);
+        console.log(currentContract);
+        let files = await getFiles(currentContract);
+        updateFiles(files);
+        let friends = await getFriends(currentContract);
+        updateFriends(friends);
+        let approvedFiles = await approvedFilesfromFriends(currentContract);
+        updateApprovedFiles(approvedFiles);
       }
     } catch (error) {
       console.error("Error fetching account from MetaMask:", error);
-      setAccountToLocalStorage(null);
+      toast.error("Error connecting to MetaMask. Please try again.");
     }
   };
 
   const handleAccountsChanged = async (accounts) => {
-    if (accounts.length === 0) {
-      // If the user disconnects their account
-      setAccountToLocalStorage(null);
-      updateAccount("Not Connected");
-      updateFiles([]);
-      updateFriends([]);
-      updateApprovedFiles([]);
-      toast.success("Wallet disconnected!", {
-        id: "connect-wallet",
-      });
-    } else {
-      const account = accounts[0];
-      updateAccount(account);
-      setAccountToLocalStorage(account);
-      toast.success("Wallet connected successfully!", {
-        id: "connect-wallet",
-      });
-
-      if (contract) {
-        // Re-fetch data for the new account
-        const [files, friends, approvedFiles] = await Promise.all([
-          getFiles(contract),
-          getFriends(contract),
-          approvedFilesfromFriends(contract),
-        ]);
-
-        updateFiles(files);
-        updateFriends(friends);
-        updateApprovedFiles(approvedFiles);
+    try {
+      const { ethereum } = window;
+      if (!ethereum) {
+        toast.error("MetaMask is not installed!", {
+          id: "connect-wallet",
+        });
+        return;
       }
+      console.log(accounts);
+      if (accounts.length === 0) {
+        updateAccount("Not Connected");
+        updateFiles([]);
+        updateFriends([]);
+        updateApprovedFiles([]);
+        toast.success("Wallet disconnected!", {
+          id: "connect-wallet",
+        });
+      } else {
+        const currentContract = await initializeEthers(ethereum);
+        setContract(currentContract);
+        const account = accounts[0];
+        updateAccount(account);
+        let friends = await getFriends(currentContract);
+        updateFriends(friends);
+        let files = await getFiles(currentContract);
+        updateFiles(files);
+        let approvedFiles = await approvedFilesfromFriends(currentContract);
+        updateApprovedFiles(approvedFiles);
+        toast.success("Wallet connected successfully!", {
+          id: "connect-wallet",
+        });
+      }
+    } catch (error) {
+      console.error("Error handling account change:", error);
+      toast.error("Error during account change. Please try again.");
     }
   };
 
   useEffect(() => {
-    const { ethereum } = window;
-
-    const fetchData = async () => {
+    async function fetchData() {
       await checkConnectedAccount();
-
+      const { ethereum } = window;
       if (ethereum) {
         ethereum.on("accountsChanged", handleAccountsChanged);
       }
-    };
 
+      return () => {
+        if (ethereum) {
+          ethereum.removeListener("accountsChanged", handleAccountsChanged);
+        }
+      };
+    }
     fetchData();
-
-    return () => {
-      if (ethereum) {
-        ethereum.removeListener("accountsChanged", handleAccountsChanged);
-      }
-    };
-  }, [contract]);
+  }, []);
 
   return (
     <>
@@ -144,7 +128,7 @@ export const App = () => {
       {account === "Not Connected" ? (
         <Homedisconnect />
       ) : (
-        <div className="min-h-screen max-w-screen bg-black text-white flex flex-col gap-4 relative px-2 font-outfit">
+        <div className="relative flex flex-col min-h-screen gap-4 px-2 text-white bg-black max-w-screen font-outfit">
           <Modalbox contract={contract} />
           <Navbar />
           <FileUpload contract={contract} />

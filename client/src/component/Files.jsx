@@ -14,38 +14,39 @@ export const Files = memo(() => {
 
   return (
     <section>
-      <div className="text-xl font-bold underline mb-4">FILES</div>
-      <div className="flex flex-row gap-3 flex-wrap">
-        {files.map((file, index) => (
-          <div
-            key={index}
-            className="bg-white p-2 rounded-md shadow-md max-w-60 relative"
-          >
-            <div className="relative">
-              {/* <p className="text-black">{file.fileName}</p> */}
-              <img
-                src={`https://gateway.pinata.cloud/ipfs/${file.ipfsHash}`}
-                alt={file.fileName}
-                className="break-words w-full h-40 object-contain border-black text-gray-500"
-              />
-            </div>
-            <p className="text-sm text-gray-500">
-              Uploaded :{" "}
-              {new Date(Number(file.timestamp) * 1000).toLocaleString()}
-            </p>
-            <button
-              onClick={() =>
-                updateModal({
-                  ipfsHash: file.ipfsHash,
-                  openModal: dialogBox.LIST,
-                })
-              }
-              className="absolute top-[-10px] right-[-8px] rounded-full p-1 bg-sky-400 hover:bg-sky-500 text-white flex justify-center items-center transition-all duration-200"
+      <div className="mb-4 text-xl font-bold underline">FILES</div>
+      <div className="flex flex-row flex-wrap gap-3">
+        {files &&
+          files.map((file, index) => (
+            <div
+              key={index}
+              className="relative p-2 bg-white rounded-md shadow-md max-w-60"
             >
-              <IoEllipsisVertical />
-            </button>
-          </div>
-        ))}
+              <div className="relative">
+                {/* <p className="text-black">{file.fileName}</p> */}
+                <img
+                  src={`https://gateway.pinata.cloud/ipfs/${file.ipfsHash}`}
+                  alt={file.fileName}
+                  className="object-contain w-full h-40 text-gray-500 break-words border-black"
+                />
+              </div>
+              <p className="text-sm text-gray-500">
+                Uploaded :{" "}
+                {new Date(Number(file.timestamp) * 1000).toLocaleString()}
+              </p>
+              <button
+                onClick={() =>
+                  updateModal({
+                    ipfsHash: file.ipfsHash,
+                    openModal: dialogBox.LIST,
+                  })
+                }
+                className="absolute top-[-10px] right-[-8px] rounded-full p-1 bg-sky-400 hover:bg-sky-500 text-white flex justify-center items-center transition-all duration-200"
+              >
+                <IoEllipsisVertical />
+              </button>
+            </div>
+          ))}
       </div>
     </section>
   );
